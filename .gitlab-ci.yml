@@ -14,7 +14,7 @@ variables:
   REGION: "us-central1"
   REPO: "ai-powered-pdf-table-extractor-repo" # name of the repo in the artifact registry
   REGISTRY: "us-central1-docker.pkg.dev" # registry url
-  CLUSTER: "ai-powered-pdf-table-extractor-cluster-1" # name of the cluster in the gke
+  SERVICE_NAME: "ai-powered-pdf-table-extractor" # name of the Cloud Run service
   IMAGE_NAME: $REGISTRY/$PROJECT_ID/$REPO/ai-powered-pdf-table-extractor
 
 # Test Stage: Run pytest tests
@@ -174,8 +174,8 @@ security:container-scan:
   allow_failure: true  # Don't block deployment, but report issues
   needs: ["build_docker_image"]  # Wait for build to complete
 
-# Deploy Stage: Deploy the Docker image to GKE
-deploy_to_gke:
+# Deploy Stage: Deploy the Docker image to Cloud Run
+deploy_to_cloud_run:
   stage: deploy
   image: google/cloud-sdk:latest
   needs:
@@ -186,12 +186,9 @@ deploy_to_gke:
     - gcloud auth activate-service-account --key-file=gcp-key.json
     - gcloud config set project $PROJECT_ID
   script:
-    # Get GKE cluster credentials
-    - gcloud container clusters get-credentials $CLUSTER --region $REGION --project $PROJECT_ID
-    # Update the image tag in the deployment and apply
-    - kubectl set image deployment/ai-powered-pdf-table-extractor ai-powered-pdf-table-extractor=$IMAGE_NAME:$CI_COMMIT_SHORT_SHA --record || kubectl apply -f kubernetes-deployment.yaml
-    # Verify deployment
-    - kubectl rollout status deployment/ai-powered-pdf-table-extractor
+    # Deploy to Cloud Run
+    - echo "Deploying to Cloud Run..."
+    - gcloud run deploy $SERVICE_NAME --image $IMAGE_NAME:$CI_COMMIT_SHORT_SHA --region $REGION --platform managed --allow-unauthenticated --port 8501
   only:
     - main
     - master

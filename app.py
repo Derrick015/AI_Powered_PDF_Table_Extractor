@@ -43,9 +43,11 @@ logging.info("Starting Tabulify PDF application")
 # Page configuration
 st.set_page_config(
     page_title="Tabulify PDF",
-    page_icon="logo.png",
+    page_icon="logo.jpg",
     layout="wide"
 )
+
+
 
 # Initialize session state variables if they don't exist
 if 'processing_complete' not in st.session_state:
@@ -70,8 +72,8 @@ openai_client = AsyncOpenAI(api_key=open_api_key)
 # App header with logo
 col1, col2 = st.columns([1, 9])
 with col1:
-    if os.path.exists("logo.png"):
-        st.image("logo.png", width=120)
+    if os.path.exists("logo.jpg"):
+        st.image("logo.jpg", width=120)
 with col2:
     st.markdown("<h1 style='margin-top: 3px;'>Tabulify PDF</h1>", unsafe_allow_html=True)
 
