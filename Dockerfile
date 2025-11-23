@@ -8,9 +8,9 @@ COPY src/ ./src/
 RUN pip install --no-cache-dir .
 
 COPY app.py .
-COPY logo.png .
-COPY favicon.png .
-# COPY .streamlit/ ./.streamlit/ 
+COPY logo.jpg .
+COPY favicon.jpg .
+
 
 RUN mkdir -p logs output_files
 
