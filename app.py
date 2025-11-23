@@ -1,4 +1,12 @@
 import streamlit as st
+
+# Page configuration
+st.set_page_config(
+    page_title="Tabulify PDF",
+    page_icon="logo.jpg",
+    layout="wide"
+)
+
 import os
 import tempfile
 import time
@@ -39,13 +47,6 @@ logging.basicConfig(
 
 # Log the start of the application
 logging.info("Starting Tabulify PDF application")
-
-# Page configuration
-st.set_page_config(
-    page_title="Tabulify PDF",
-    page_icon="logo.jpg",
-    layout="wide"
-)
 
 # Custom CSS
 st.markdown("""
