@@ -188,7 +188,7 @@ deploy_to_cloud_run:
   script:
     # Deploy to Cloud Run
     - echo "Deploying to Cloud Run..."
-    - gcloud run deploy $SERVICE_NAME --image $IMAGE_NAME:$CI_COMMIT_SHORT_SHA --region $REGION --platform managed --allow-unauthenticated --port 8501
+    - gcloud run deploy $SERVICE_NAME --image $IMAGE_NAME:$CI_COMMIT_SHORT_SHA --region $REGION --platform managed --allow-unauthenticated --port 8501 --set-env-vars OPENAI_API_KEY=$OPENAI_API_KEY
   only:
     - main
     - master
