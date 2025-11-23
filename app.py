@@ -47,6 +47,74 @@ st.set_page_config(
     layout="wide"
 )
 
+# Custom CSS
+st.markdown("""
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        html, body, [class*="css"]  {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .stApp {
+            background-color: #FFFFFF;
+        }
+        
+        h1 {
+            color: #1E293B;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+        
+        h2, h3 {
+            color: #334155;
+            font-weight: 600;
+        }
+        
+        /* Button Styling */
+        .stButton > button {
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        
+        .stButton > button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Inputs */
+        .stTextInput > div > div > input, .stTextArea > div > div > textarea {
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+        }
+        
+        .stSelectbox > div > div > div {
+            border-radius: 8px;
+        }
+        
+        /* Sidebar */
+        [data-testid="stSidebar"] {
+            background-color: #F8FAFC;
+            border-right: 1px solid #E2E8F0;
+        }
+        
+        /* Expander */
+        .streamlit-expanderHeader {
+            background-color: #FFFFFF;
+            border-radius: 8px;
+        }
+        
+        /* Success/Info/Warning/Error Messages */
+        .stAlert {
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 
 
 # Initialize session state variables if they don't exist
@@ -70,68 +138,70 @@ if not open_api_key:
 openai_client = AsyncOpenAI(api_key=open_api_key)
 
 # App header with logo
-col1, col2 = st.columns([1, 9])
+col1, col2 = st.columns([1, 11])
 with col1:
     if os.path.exists("logo.jpg"):
-        st.image("logo.jpg", width=120)
+        st.image("logo.jpg", width=90)
 with col2:
-    st.markdown("<h1 style='margin-top: 3px;'>Tabulify PDF</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='padding-top: 0rem; margin-bottom: 0.5rem;'>Tabulify PDF</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 1.1rem; color: #64748B;'>AI-powered table extraction: Convert PDF tables to Excel or CSV instantly.</p>", unsafe_allow_html=True)
 
-
-st.markdown("<p style='font-size: 14px;'>Tabulify PDF uses AI to extract tables from PDFs and export them to Excel or CSV</p>", unsafe_allow_html=True)
+st.markdown("---")
 # Sidebar for options
 with st.sidebar:
-    # st.header("Settings")
+    st.header("Configuration")
     
     # Ensure unified output directory with the CLI version
     if not os.path.exists("output_files"):
         os.makedirs("output_files")
         
     # Output file name
-    file_name = st.text_input("File name", value=st.session_state.file_name)
+    st.subheader("1. Project Details")
+    file_name = st.text_input("Output File Name", value=st.session_state.file_name, help="Name of the file to be generated (without extension)")
     st.session_state.file_name = file_name
     
-    # Use text_area instead of text_input for more space
+    # Instructions
+    st.subheader("2. AI Instructions")
     user_text = st.text_area(
-        "Instructions for AI", 
+        "What should be extracted?", 
         value="Extract all data from the table(s)",
-        height=300  
+        height=150,
+        help="Provide specific instructions to the AI, e.g., 'Extract the Balance Sheet table and ignore footnotes'."
     )
     
-    st.markdown("---")  # Add some space with a horizontal line
-    
-    # Add checkbox for table in image detection
-    table_in_image = st.checkbox("Image & Inference Mode", value=True, 
-                                help="Enable this mode for: (1) Extracting tables from images within PDFs, (2) Adding creative interpretations like additional columns or values based on user instructions. Note: This mode bypasses text validation for more flexible results.")
-    
-    # Add checkbox to include table and page information in output
-    add_in_table_and_page_information = st.checkbox("Add table and page information", value=False, 
-                                 help="Enable this if you want to add table name, position and page number to the table")
-
-    model = "gpt-5-mini"
-    vision_model = "gpt-5-mini"
-    MAX_PAGES = 10  # Maximum number of pages that can be processed at once
-
-    # Add horizontal line for visual separation of sections
-    st.markdown("---")
-    
-    # Output format selection section
-    st.subheader("Output Format")
+    # Output format
+    st.subheader("3. Output Format")
     file_format = st.selectbox(
         "Select file format:",
         options=["Excel (.xlsx)", "CSV (.csv)"],
         index=0  # Default to Excel format
     )
     
+    st.markdown("---")
+    
+    # Advanced Settings in Expander
+    with st.expander("Advanced Settings", expanded=False):
+        # Add checkbox for table in image detection
+        table_in_image = st.checkbox("Image & Inference Mode", value=True, 
+                                    help="Enable this mode for: (1) Extracting tables from images within PDFs, (2) Adding creative interpretations like additional columns or values based on user instructions. Note: This mode bypasses text validation for more flexible results.")
+        
+        # Add checkbox to include table and page information in output
+        add_in_table_and_page_information = st.checkbox("Include Metadata", value=False, 
+                                     help="Add table name, position, and page number columns to the output")
+
+    model = "gpt-5-mini"
+    vision_model = "gpt-5-mini"
+    MAX_PAGES = 10  # Maximum number of pages that can be processed at once
+
     # Input validation logic - ensure sensible defaults if user inputs are empty
     if not file_name.strip():
         file_name = "output_file"
         st.session_state.file_name = file_name
-        st.warning("Using default filename 'output_file' as none was provided.")
+        st.caption("Using default filename: 'output_file'")
     
     if not user_text.strip():
         user_text = "Extract all data from the table(s)"
-        st.warning("Using default instructions 'Extract all data from the table(s)' as none were provided.")
+        st.caption("Using default instructions.")
 
 # File upload section
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf", accept_multiple_files=False)
@@ -163,7 +233,10 @@ if uploaded_file:
         # Page range selection section - allows users to choose which pages to process
         st.subheader("Page Range Selection")
         range_option = st.radio("Select pages to process:", 
-                               ["All pages", "Specific range", "Custom pages"])
+                               ["All pages", "Specific range", "Custom pages"],
+                               horizontal=True)
+        
+        st.markdown("---")
         
         if range_option == "All pages":
             # Process the entire document
@@ -287,7 +360,7 @@ if uploaded_file:
             st.info("ℹ️ Pages with no tables will be skipped")
             
             # Only show the process button if we haven't completed processing or if we're reprocessing
-            process_button = st.button("Process Selected Pages")
+            process_button = st.button("Process Selected Pages", type="primary", use_container_width=True)
             
             if process_button:
                 # Reset the processing state
@@ -434,7 +507,7 @@ if uploaded_file:
                 output_final = None
                 ordered_page_numbers = None
                 
-                with st.spinner(f"Processing {len(page_indices)} page(s)... This typically takes about 2 minutes to complete"):
+                with st.spinner(f"Processing {len(page_indices)} page(s)... This typically takes about 2 minutes"):
                     try:
                         # Run the async function in the main thread
                         logging.info("Starting asyncio.run(process_pages())...")
@@ -514,10 +587,11 @@ if uploaded_file:
                             
                             with open(excel_file, "rb") as file:
                                 st.download_button(
-                                    label="Download",
+                                    label="Download Excel File",
                                     data=file,
                                     file_name=f"{file_name}_{preview_format.split(':')[0].strip().replace(' ', '_').lower()}.xlsx",
-                                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                    type="primary"
                                 )
                         else:  # CSV format
                             csv_base_path = f'output_files/{file_name}'
@@ -529,10 +603,11 @@ if uploaded_file:
                                 
                                 with open(csv_file, "rb") as file:
                                     st.download_button(
-                                        label="Download",
+                                        label="Download CSV File",
                                         data=file,
                                         file_name=f"{file_name}_concatenated.csv",
-                                        mime="text/csv"
+                                        mime="text/csv",
+                                        type="primary"
                                     )
                             elif format_option == 2:  # Format 2: Tables by page
                                 # For CSV format 2, we create a zip with multiple files
@@ -551,10 +626,11 @@ if uploaded_file:
                                     zip_buffer.seek(0)
                                     
                                     st.download_button(
-                                        label="Download",
+                                        label="Download ZIP File",
                                         data=zip_buffer,
                                         file_name=f"{file_name}_pages.zip",
-                                        mime="application/zip"
+                                        mime="application/zip",
+                                        type="primary"
                                     )
                             else:  # Format 3: All tables on one sheet
                                 csv_file = f'{csv_base_path}_all_tables_with_gaps.csv'
@@ -562,10 +638,11 @@ if uploaded_file:
                                 
                                 with open(csv_file, "rb") as file:
                                     st.download_button(
-                                        label="Download",
+                                        label="Download CSV File",
                                         data=file,
                                         file_name=f"{file_name}_all_tables_with_gaps.csv",
-                                        mime="text/csv"
+                                        mime="text/csv",
+                                        type="primary"
                                     )
                         
                         # Ensure all dfs are unique
