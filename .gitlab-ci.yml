@@ -11,9 +11,9 @@ stages:
 # Global variables
 variables:
   PROJECT_ID: "deron-innovations"
-  REGION: "europe-west2"
+  REGION: "us-central1"
   REPO: "ai-powered-pdf-table-extractor-repo" # name of the repo in the artifact registry
-  REGISTRY: "europe-west2-docker.pkg.dev" # registry url
+  REGISTRY: "us-central1-docker.pkg.dev" # registry url
   SERVICE_NAME: "ai-powered-pdf-table-extractor" # name of the Cloud Run service
   IMAGE_NAME: $REGISTRY/$PROJECT_ID/$REPO/ai-powered-pdf-table-extractor
 
