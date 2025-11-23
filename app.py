@@ -50,67 +50,207 @@ st.set_page_config(
 # Custom CSS
 st.markdown("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
         html, body, [class*="css"]  {
             font-family: 'Inter', sans-serif;
         }
         
         .stApp {
-            background-color: #FFFFFF;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        }
+        
+        /* Main content area */
+        .main .block-container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
         }
         
         h1 {
-            color: #1E293B;
+            color: #F8FAFC;
             font-weight: 800;
             letter-spacing: -0.03em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         h2, h3 {
-            color: #334155;
+            color: #E2E8F0;
             font-weight: 600;
+        }
+        
+        /* Subheaders */
+        .stSubheader {
+            color: #CBD5E1 !important;
         }
         
         /* Button Styling */
         .stButton > button {
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: 600;
             border: none;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            padding: 0.6rem 1.5rem;
+            font-size: 1rem;
         }
         
         .stButton > button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 8px 16px -4px rgba(37, 99, 235, 0.4);
+        }
+        
+        /* Primary button specific styling */
+        .stButton > button[kind="primary"] {
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .stButton > button[kind="primary"]:hover {
+            background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.5);
+        }
+        
+        /* Download button styling */
+        .stDownloadButton > button {
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+            padding: 0.6rem 1.5rem;
+            font-size: 1rem;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .stDownloadButton > button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.5) !important;
         }
         
         /* Inputs */
         .stTextInput > div > div > input, .stTextArea > div > div > textarea {
-            border-radius: 8px;
-            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background-color: #1E293B;
+            color: #F8FAFC;
+            transition: all 0.2s ease;
+        }
+        
+        .stTextInput > div > div > input:focus, .stTextArea > div > div > textarea:focus {
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
         
         .stSelectbox > div > div > div {
-            border-radius: 8px;
+            border-radius: 10px;
+            background-color: #1E293B;
+            border: 1px solid #334155;
+            color: #F8FAFC;
+        }
+        
+        /* Number input */
+        .stNumberInput > div > div > input {
+            border-radius: 10px;
+            background-color: #1E293B;
+            border: 1px solid #334155;
+            color: #F8FAFC;
         }
         
         /* Sidebar */
         [data-testid="stSidebar"] {
-            background-color: #F8FAFC;
-            border-right: 1px solid #E2E8F0;
+            background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+            border-right: 1px solid #334155;
+        }
+        
+        [data-testid="stSidebar"] .stMarkdown {
+            color: #E2E8F0;
+        }
+        
+        /* Sidebar header */
+        [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
+            color: #F8FAFC;
         }
         
         /* Expander */
         .streamlit-expanderHeader {
-            background-color: #FFFFFF;
-            border-radius: 8px;
+            background-color: #1E293B;
+            border-radius: 10px;
+            color: #F8FAFC;
+            border: 1px solid #334155;
+        }
+        
+        .streamlit-expanderHeader:hover {
+            background-color: #334155;
+        }
+        
+        /* Checkbox */
+        .stCheckbox {
+            color: #E2E8F0;
+        }
+        
+        /* Radio buttons */
+        .stRadio > label {
+            color: #E2E8F0;
+        }
+        
+        /* File uploader */
+        [data-testid="stFileUploader"] {
+            background-color: #1E293B;
+            border-radius: 10px;
+            border: 2px dashed #334155;
+            padding: 2rem;
+        }
+        
+        [data-testid="stFileUploader"]:hover {
+            border-color: #2563EB;
         }
         
         /* Success/Info/Warning/Error Messages */
         .stAlert {
-            border-radius: 8px;
+            border-radius: 10px;
             border: none;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Dataframe styling */
+        .stDataFrame {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        /* Tabs */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 8px;
+            background-color: transparent;
+        }
+        
+        .stTabs [data-baseweb="tab"] {
+            background-color: #1E293B;
+            border-radius: 8px;
+            color: #94A3B8;
+            border: 1px solid #334155;
+        }
+        
+        .stTabs [aria-selected="true"] {
+            background-color: #2563EB;
+            color: #F8FAFC;
+            border-color: #2563EB;
+        }
+        
+        /* Horizontal rule */
+        hr {
+            border-color: #334155;
+        }
+        
+        /* Text color */
+        p, label, .stMarkdown {
+            color: #CBD5E1;
+        }
+        
+        /* Caption text */
+        .stCaption {
+            color: #94A3B8;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -143,8 +283,12 @@ with col1:
     if os.path.exists("logo.jpg"):
         st.image("logo.jpg", width=90)
 with col2:
-    st.markdown("<h1 style='padding-top: 0rem; margin-bottom: 0.5rem;'>Tabulify PDF</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size: 1.1rem; color: #64748B;'>AI-powered table extraction: Convert PDF tables to Excel or CSV instantly.</p>", unsafe_allow_html=True)
+    st.markdown("""
+        <h1 style='padding-top: 0rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #60A5FA 0%, #2563EB 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;'>
+            Tabulify PDF
+        </h1>
+    """, unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 1.1rem; color: #94A3B8;'>AI-powered table extraction: Convert PDF tables to Excel or CSV instantly.</p>", unsafe_allow_html=True)
 
 st.markdown("---")
 # Sidebar for options
